@@ -1,0 +1,91 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+        "samples":{
+            "type": "object",
+            "patternProperties": {
+                ".+": {
+                    "type": "string",
+                    "pattern": "^.*\\.csv$"
+                }
+            }
+        },
+        "output_path": {
+            "oneOf": [
+                {"type": "null"},
+                {"type": "string"}
+            ]
+        },
+        "find_peaks": {
+            "type": "object",
+            "properties": {
+                "threshold_mode": {
+                    "type": "string",
+                    "enum": [
+                        "auto",
+                        "manual"
+                    ]
+                },
+                "find_peaks_mode": {
+                    "type": "string",
+                    "enum": [
+                        "normal",
+                        "scipy"
+                    ]
+                }
+            },
+            "required": [
+                "threshold_mode",
+                "find_peaks_mode"
+            ],
+            "allOf": [
+                {
+                    "if": {
+                        "properties": {
+                            "threshold_mode": {
+                                "const": "auto"
+                            }
+                        }
+                    },
+                    "then": {
+                        "properties": {
+                            "pdf": {
+                                "type": "integer",
+                                "minimum": 1
+                            }
+                        },
+                        "required": [
+                            "pdf"
+                        ]
+                    }
+                },
+                {
+                    "if": {
+                        "properties": {
+                            "threshold_mode": {
+                                "const": "manual"
+                            }
+                        }
+                    },
+                    "then": {
+                        "properties": {
+                            "thresholds": {
+                                "type": "array",
+                                "items": {"type": "number"},
+                                "minItems": 1
+                            }
+                        },
+                        "required": [
+                            "thresholds"
+                        ]
+                    }
+                }
+            ]
+        }
+    },
+    "required": [
+        "samples",
+        "find_peaks"
+    ]
+}
